@@ -1,0 +1,39 @@
+.github/workflows/build.yml
+name: Build Zoptus Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Flutter Project
+        run: |
+          flutter create --org com.zoptus --project-name zoptus_pharma_family app
+          mkdir -p app/lib
+          cp lib/main.dart app/lib/main.dart
+
+      - name: Build APK
+        run: |
+          cd app
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zoptus-Pharma-Family-APK
+          path: app/build/app/outputs/flutter-apk/app-release.app
